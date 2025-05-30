@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Serviço Realizado - Oficina AutoPro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>Oficina AutoPro</h2>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="cadastro_cliente.html">Clientes</a>
+      <a href="cadastro_veiculo.html">Veículos</a>
+      <a href="cadastro_defeito.html">Defeitos</a>
+      <a href="servico_realizado.html" class="active">Serviços</a>
+    </nav>
+  </aside>
+
+  <div class="banner-motivacional">
+    <p>🔧 Aqui na Oficina AutoPro, transformamos desafios em soluções! Seu carro em boas mãos. 🚗💨</p>
+  </div>
+
+  <main class="content">
+    <h1>Serviço Realizado</h1>
+    <form id="formServico">
+      <label for="servico">Serviço</label>
+      <input id="servico" name="servico" type="text" required placeholder="Nome do serviço" />
+
+      <label for="data">Data</label>
+      <input id="data" name="data" type="date" required />
+
+      <label for="valor">Valor (R$)</label>
+      <input id="valor" name="valor" type="number" step="0.01" required placeholder="Valor cobrado" />
+
+      <button type="submit">Salvar Serviço</button>
+    </form>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

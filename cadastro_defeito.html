@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cadastro de Defeito - Oficina AutoPro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>Oficina AutoPro</h2>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="cadastro_cliente.html">Clientes</a>
+      <a href="cadastro_veiculo.html">Veículos</a>
+      <a href="cadastro_defeito.html" class="active">Defeitos</a>
+      <a href="servico_realizado.html">Serviços</a>
+    </nav>
+  </aside>
+
+  <div class="banner-motivacional">
+    <p>🔧 Aqui na Oficina AutoPro, transformamos desafios em soluções! Seu carro em boas mãos. 🚗💨</p>
+  </div>
+
+  <main class="content">
+    <h1>Cadastro de Defeito</h1>
+    <form id="formDefeito">
+      <label for="descricao">Descrição do Defeito</label>
+      <textarea id="descricao" name="descricao" rows="4" required placeholder="Descreva o defeito do veículo"></textarea>
+
+      <button type="submit">Salvar Defeito</button>
+    </form>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

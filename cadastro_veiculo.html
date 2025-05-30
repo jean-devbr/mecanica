@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cadastro de Veículo - Oficina AutoPro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>Oficina AutoPro</h2>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="cadastro_cliente.html">Clientes</a>
+      <a href="cadastro_veiculo.html" class="active">Veículos</a>
+      <a href="cadastro_defeito.html">Defeitos</a>
+      <a href="servico_realizado.html">Serviços</a>
+    </nav>
+  </aside>
+
+  <div class="banner-motivacional">
+    <p>🔧 Aqui na Oficina AutoPro, transformamos desafios em soluções! Seu carro em boas mãos. 🚗💨</p>
+  </div>
+
+  <main class="content">
+    <h1>Cadastro de Veículo</h1>
+    <form id="formVeiculo">
+      <label for="marca">Marca</label>
+      <input id="marca" name="marca" type="text" required placeholder="Ex: Ford, Chevrolet" />
+
+      <label for="modelo">Modelo</label>
+      <input id="modelo" name="modelo" type="text" required placeholder="Ex: Fiesta, Onix" />
+
+      <label for="ano">Ano</label>
+      <input id="ano" name="ano" type="number" required min="1900" max="2099" placeholder="Ano do veículo" />
+
+      <button type="submit">Salvar Veículo</button>
+    </form>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
