@@ -77,6 +77,40 @@
           </div>
         </div>
 
+        <div class="form-row">
+          <div class="form-group">
+            <label for="marca_servico">
+              <i class="fas fa-industry"></i>
+              Marca do Serviço
+            </label>
+            <select id="marca_servico" name="marca_servico" required>
+              <option value="">Selecione a marca</option>
+              <option value="Preventiva">🔧 Manutenção Preventiva</option>
+              <option value="Corretiva">⚠️ Manutenção Corretiva</option>
+              <option value="Emergencial">🚨 Serviço Emergencial</option>
+              <option value="Revisão">📋 Revisão Programada</option>
+              <option value="Diagnóstico">🔍 Diagnóstico</option>
+              <option value="Instalação">⚙️ Instalação de Peças</option>
+              <option value="Customização">🎨 Customização</option>
+              <option value="Outros">🔧 Outros Serviços</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="status">
+              <i class="fas fa-flag"></i>
+              Status do Serviço
+            </label>
+            <select id="status" name="status" required>
+              <option value="">Selecione o status</option>
+              <option value="Pendente">⏳ Pendente</option>
+              <option value="Em Andamento">🔄 Em Andamento</option>
+              <option value="Realizado">✅ Realizado</option>
+              <option value="Cancelado">❌ Cancelado</option>
+            </select>
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="defeito_id">
             <i class="fas fa-exclamation-triangle"></i>
@@ -90,10 +124,10 @@
         <div class="form-group">
           <label for="servico_realizado">
             <i class="fas fa-wrench"></i>
-            Serviço Realizado
+            Descrição do Serviço
           </label>
           <textarea id="servico_realizado" name="servico_realizado" rows="3" required 
-                    placeholder="Descreva o serviço que foi realizado"></textarea>
+                    placeholder="Descreva detalhadamente o serviço realizado ou a ser realizado"></textarea>
         </div>
 
         <div class="form-row">
@@ -114,12 +148,22 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="data_servico">
-            <i class="fas fa-calendar"></i>
-            Data do Serviço
-          </label>
-          <input id="data_servico" name="data_servico" type="date" required />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="data_servico">
+              <i class="fas fa-calendar"></i>
+              Data do Serviço
+            </label>
+            <input id="data_servico" name="data_servico" type="date" required />
+          </div>
+
+          <div class="form-group">
+            <label for="prazo_entrega">
+              <i class="fas fa-clock"></i>
+              Prazo de Entrega
+            </label>
+            <input id="prazo_entrega" name="prazo_entrega" type="date" placeholder="Data prevista para entrega" />
+          </div>
         </div>
 
         <div class="form-group">
@@ -128,7 +172,7 @@
             Observações
           </label>
           <textarea id="observacoes" name="observacoes" rows="2" 
-                    placeholder="Observações adicionais (opcional)"></textarea>
+                    placeholder="Observações adicionais, peças utilizadas, recomendações, etc. (opcional)"></textarea>
         </div>
 
         <button type="submit" class="btn-primary">
@@ -139,7 +183,7 @@
     </div>
 
     <div id="serviceList" class="data-table" style="display: none;">
-      <h2>Serviços Realizados</h2>
+      <h2>Serviços Registrados</h2>
       <div class="table-container">
         <table id="servicosTable">
           <thead>
@@ -147,9 +191,12 @@
               <th>Data</th>
               <th>Cliente</th>
               <th>Veículo</th>
+              <th>Marca</th>
               <th>Serviço</th>
               <th>Valor</th>
               <th>Funcionário</th>
+              <th>Status</th>
+              <th>Prazo</th>
             </tr>
           </thead>
           <tbody>

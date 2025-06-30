@@ -129,12 +129,44 @@ class OficinaDB {
           cliente_id: 1,
           veiculo_id: 1,
           defeito_id: 1,
+          marca_servico: "Preventiva",
           servico_realizado: "Troca de óleo e filtro + verificação do motor",
           valor: 150.00,
           funcionario: "Carlos Mecânico",
           data_servico: new Date().toISOString().split('T')[0],
+          prazo_entrega: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           observacoes: "Serviço realizado com sucesso, motor normalizado",
-          status: "Concluído",
+          status: "Realizado",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 2,
+          cliente_id: 2,
+          veiculo_id: 2,
+          defeito_id: 2,
+          marca_servico: "Corretiva",
+          servico_realizado: "Troca de pastilhas de freio e sangria do sistema",
+          valor: 280.00,
+          funcionario: "Ana Mecânica",
+          data_servico: new Date().toISOString().split('T')[0],
+          prazo_entrega: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          observacoes: "Pastilhas muito desgastadas, recomendado verificar discos",
+          status: "Em Andamento",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 3,
+          cliente_id: 3,
+          veiculo_id: 3,
+          defeito_id: null,
+          marca_servico: "Revisão",
+          servico_realizado: "Revisão completa dos 10.000 km",
+          valor: 350.00,
+          funcionario: "Roberto Técnico",
+          data_servico: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          prazo_entrega: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          observacoes: "Revisão agendada conforme manual do fabricante",
+          status: "Pendente",
           data_cadastro: new Date().toISOString()
         }
       ];
@@ -222,7 +254,7 @@ class OficinaDB {
     return novoDefeito;
   }
 
-  // Métodos para Serviços
+  // Métodos para Serviços (ATUALIZADO)
   getServicos() {
     const servicos = JSON.parse(localStorage.getItem('oficina_servicos') || '[]');
     const clientes = this.getClientes();
@@ -251,8 +283,10 @@ class OficinaDB {
     const novoServico = {
       ...servico,
       id: novoId,
-      status: 'Concluído',
-      data_cadastro: new Date().toISOString()
+      data_cadastro: new Date().toISOString(),
+      // Converter strings vazias para null
+      defeito_id: servico.defeito_id || null,
+      prazo_entrega: servico.prazo_entrega || null
     };
     servicos.push(novoServico);
     localStorage.setItem('oficina_servicos', JSON.stringify(servicos));
@@ -671,7 +705,7 @@ function toggleDefectList() {
   }
 }
 
-// Funções para Serviços
+// Funções para Serviços (ATUALIZADAS)
 function loadServices() {
   try {
     const services = db.getServicos();
@@ -686,16 +720,30 @@ function displayServices(services) {
   const tbody = document.querySelector('#servicosTable tbody');
   if (!tbody) return;
   
-  tbody.innerHTML = services.map(service => `
-    <tr>
-      <td>${formatDate(service.data_servico)}</td>
-      <td>${service.cliente_nome || 'N/A'}</td>
-      <td>${service.marca} ${service.modelo} (${service.placa || 'S/P'})</td>
-      <td>${service.servico_realizado}</td>
-      <td>${formatCurrency(service.valor)}</td>
-      <td>${service.funcionario}</td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = services.map(service => {
+    const statusClass = {
+      'Pendente': 'background: #f39c12; color: white;',
+      'Em Andamento': 'background: #3498db; color: white;',
+      'Realizado': 'background: #27ae60; color: white;',
+      'Cancelado': 'background: #e74c3c; color: white;'
+    };
+    
+    const prazoFormatado = service.prazo_entrega ? formatDate(service.prazo_entrega) : 'N/A';
+    
+    return `
+      <tr>
+        <td>${formatDate(service.data_servico)}</td>
+        <td>${service.cliente_nome || 'N/A'}</td>
+        <td>${service.marca} ${service.modelo} (${service.placa || 'S/P'})</td>
+        <td><span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; background: #6c757d; color: white;">${service.marca_servico || 'N/A'}</span></td>
+        <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${service.servico_realizado}">${service.servico_realizado}</td>
+        <td>${formatCurrency(service.valor)}</td>
+        <td>${service.funcionario}</td>
+        <td><span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; ${statusClass[service.status] || ''}">${service.status}</span></td>
+        <td>${prazoFormatado}</td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function setupClientVehicleFilter() {
@@ -750,17 +798,26 @@ function displayAllServices(services) {
   const tbody = document.querySelector('#allServicesTable tbody');
   if (!tbody) return;
   
-  tbody.innerHTML = services.map(service => `
-    <tr>
-      <td>${formatDate(service.data_servico)}</td>
-      <td>${service.cliente_nome || 'N/A'}</td>
-      <td>${service.marca} ${service.modelo} (${service.placa || 'S/P'})</td>
-      <td>${service.servico_realizado}</td>
-      <td>${formatCurrency(service.valor)}</td>
-      <td>${service.funcionario}</td>
-      <td><span class="status-badge">${service.status || 'Concluído'}</span></td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = services.map(service => {
+    const statusClass = {
+      'Pendente': 'background: #f39c12; color: white;',
+      'Em Andamento': 'background: #3498db; color: white;',
+      'Realizado': 'background: #27ae60; color: white;',
+      'Cancelado': 'background: #e74c3c; color: white;'
+    };
+    
+    return `
+      <tr>
+        <td>${formatDate(service.data_servico)}</td>
+        <td>${service.cliente_nome || 'N/A'}</td>
+        <td>${service.marca} ${service.modelo} (${service.placa || 'S/P'})</td>
+        <td>${service.servico_realizado}</td>
+        <td>${formatCurrency(service.valor)}</td>
+        <td>${service.funcionario}</td>
+        <td><span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; ${statusClass[service.status] || ''}">${service.status || 'Concluído'}</span></td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function setDefaultMonth() {
