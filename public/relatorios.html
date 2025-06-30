@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relatórios - Oficina AutoPro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fas fa-wrench"></i>
+      <h2>AutoPro</h2>
+    </div>
+    <nav>
+      <a href="index.html">
+        <i class="fas fa-tachometer-alt"></i>
+        Dashboard
+      </a>
+      <a href="cadastro_cliente.html">
+        <i class="fas fa-users"></i>
+        Clientes
+      </a>
+      <a href="cadastro_veiculo.html">
+        <i class="fas fa-car"></i>
+        Veículos
+      </a>
+      <a href="cadastro_defeito.html">
+        <i class="fas fa-exclamation-triangle"></i>
+        Defeitos
+      </a>
+      <a href="servico_realizado.html">
+        <i class="fas fa-tools"></i>
+        Serviços
+      </a>
+      <a href="relatorios.html" class="active">
+        <i class="fas fa-chart-bar"></i>
+        Relatórios
+      </a>
+    </nav>
+  </aside>
+
+  <div class="banner-motivacional">
+    <p>🔧 Oficina AutoPro - Excelência em cada serviço! Transformando problemas em soluções. 🚗💨</p>
+  </div>
+
+  <main class="content">
+    <div class="page-header">
+      <h1><i class="fas fa-chart-bar"></i> Relatórios e Estatísticas</h1>
+    </div>
+
+    <div class="reports-container">
+      <div class="report-section">
+        <h2><i class="fas fa-calendar-month"></i> Relatório Mensal</h2>
+        <div class="report-filters">
+          <input type="month" id="monthFilter" />
+          <button onclick="generateMonthlyReport()" class="btn-primary">
+            <i class="fas fa-search"></i> Gerar Relatório
+          </button>
+        </div>
+        <div id="monthlyReport" class="report-content"></div>
+      </div>
+
+      <div class="report-section">
+        <h2><i class="fas fa-tools"></i> Todos os Serviços</h2>
+        <div class="table-container">
+          <table id="allServicesTable">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Veículo</th>
+                <th>Serviço</th>
+                <th>Valor</th>
+                <th>Funcionário</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dados carregados via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

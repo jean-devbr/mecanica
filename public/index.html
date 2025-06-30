@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard - Oficina AutoPro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fas fa-wrench"></i>
+      <h2>AutoPro</h2>
+    </div>
+    <nav>
+      <a href="index.html" class="active">
+        <i class="fas fa-tachometer-alt"></i>
+        Dashboard
+      </a>
+      <a href="cadastro_cliente.html">
+        <i class="fas fa-users"></i>
+        Clientes
+      </a>
+      <a href="cadastro_veiculo.html">
+        <i class="fas fa-car"></i>
+        Veículos
+      </a>
+      <a href="cadastro_defeito.html">
+        <i class="fas fa-exclamation-triangle"></i>
+        Defeitos
+      </a>
+      <a href="servico_realizado.html">
+        <i class="fas fa-tools"></i>
+        Serviços
+      </a>
+      <a href="relatorios.html">
+        <i class="fas fa-chart-bar"></i>
+        Relatórios
+      </a>
+    </nav>
+  </aside>
+
+  <div class="banner-motivacional">
+    <p>🔧 Oficina AutoPro - Excelência em cada serviço! Transformando problemas em soluções. 🚗💨</p>
+  </div>
+
+  <main class="content">
+    <div class="dashboard-header">
+      <h1>Dashboard - Visão Geral</h1>
+      <div class="date-info">
+        <i class="fas fa-calendar"></i>
+        <span id="currentDate"></span>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="totalClientes">0</h3>
+          <p>Clientes Cadastrados</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-car"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="totalVeiculos">0</h3>
+          <p>Veículos Registrados</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-tools"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="servicosMes">0</h3>
+          <p>Serviços Este Mês</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="faturamentoMes">R$ 0,00</h3>
+          <p>Faturamento Mensal</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <h2>Ações Rápidas</h2>
+      <div class="actions-grid">
+        <a href="cadastro_cliente.html" class="action-btn">
+          <i class="fas fa-user-plus"></i>
+          <span>Novo Cliente</span>
+        </a>
+        <a href="cadastro_veiculo.html" class="action-btn">
+          <i class="fas fa-car"></i>
+          <span>Novo Veículo</span>
+        </a>
+        <a href="servico_realizado.html" class="action-btn">
+          <i class="fas fa-plus-circle"></i>
+          <span>Registrar Serviço</span>
+        </a>
+        <a href="relatorios.html" class="action-btn">
+          <i class="fas fa-file-alt"></i>
+          <span>Ver Relatórios</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="recent-services">
+      <h2>Últimos Serviços</h2>
+      <div class="services-table">
+        <table id="recentServicesTable">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Cliente</th>
+              <th>Veículo</th>
+              <th>Serviço</th>
+              <th>Valor</th>
+              <th>Funcionário</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Dados carregados via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

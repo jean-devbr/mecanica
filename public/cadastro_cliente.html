@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cadastro de Cliente - Oficina AutoPro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fas fa-wrench"></i>
+      <h2>AutoPro</h2>
+    </div>
+    <nav>
+      <a href="index.html">
+        <i class="fas fa-tachometer-alt"></i>
+        Dashboard
+      </a>
+      <a href="cadastro_cliente.html" class="active">
+        <i class="fas fa-users"></i>
+        Clientes
+      </a>
+      <a href="cadastro_veiculo.html">
+        <i class="fas fa-car"></i>
+        Veículos
+      </a>
+      <a href="cadastro_defeito.html">
+        <i class="fas fa-exclamation-triangle"></i>
+        Defeitos
+      </a>
+      <a href="servico_realizado.html">
+        <i class="fas fa-tools"></i>
+        Serviços
+      </a>
+      <a href="relatorios.html">
+        <i class="fas fa-chart-bar"></i>
+        Relatórios
+      </a>
+    </nav>
+  </aside>
+
+  <div class="banner-motivacional">
+    <p>🔧 Oficina AutoPro - Excelência em cada serviço! Transformando problemas em soluções. 🚗💨</p>
+  </div>
+
+  <main class="content">
+    <div class="page-header">
+      <h1><i class="fas fa-user-plus"></i> Cadastro de Cliente</h1>
+      <button class="btn-secondary" onclick="toggleClientList()">
+        <i class="fas fa-list"></i> Ver Clientes
+      </button>
+    </div>
+
+    <div class="form-container">
+      <form id="formCliente">
+        <div class="form-group">
+          <label for="nome">
+            <i class="fas fa-user"></i>
+            Nome Completo
+          </label>
+          <input id="nome" name="nome" type="text" required placeholder="Nome completo do cliente" />
+        </div>
+
+        <div class="form-group">
+          <label for="telefone">
+            <i class="fas fa-phone"></i>
+            Telefone
+          </label>
+          <input id="telefone" name="telefone" type="tel" required placeholder="(00) 00000-0000" />
+        </div>
+
+        <div class="form-group">
+          <label for="email">
+            <i class="fas fa-envelope"></i>
+            E-mail
+          </label>
+          <input id="email" name="email" type="email" required placeholder="email@exemplo.com" />
+        </div>
+
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i>
+          Salvar Cliente
+        </button>
+      </form>
+    </div>
+
+    <div id="clientList" class="data-table" style="display: none;">
+      <h2>Clientes Cadastrados</h2>
+      <div class="table-container">
+        <table id="clientesTable">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Telefone</th>
+              <th>E-mail</th>
+              <th>Data Cadastro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Dados carregados via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
