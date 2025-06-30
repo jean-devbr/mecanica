@@ -1,5 +1,229 @@
-// Configuração da API
-const API_BASE = '/api';
+// Sistema de Gestão Oficina AutoPro - Frontend Puro
+// Compatível com Vercel e hospedagem estática
+
+// Configuração do sistema de dados local
+class OficinaDB {
+  constructor() {
+    this.initializeStorage();
+  }
+
+  initializeStorage() {
+    // Inicializar estruturas de dados se não existirem
+    if (!localStorage.getItem('oficina_clientes')) {
+      localStorage.setItem('oficina_clientes', JSON.stringify([]));
+    }
+    if (!localStorage.getItem('oficina_veiculos')) {
+      localStorage.setItem('oficina_veiculos', JSON.stringify([]));
+    }
+    if (!localStorage.getItem('oficina_defeitos')) {
+      localStorage.setItem('oficina_defeitos', JSON.stringify([]));
+    }
+    if (!localStorage.getItem('oficina_servicos')) {
+      localStorage.setItem('oficina_servicos', JSON.stringify([]));
+    }
+    
+    // Dados de exemplo para demonstração
+    this.seedData();
+  }
+
+  seedData() {
+    const clientes = this.getClientes();
+    if (clientes.length === 0) {
+      // Adicionar alguns dados de exemplo
+      const clientesExemplo = [
+        {
+          id: 1,
+          nome: "João Silva",
+          telefone: "(11) 99999-9999",
+          email: "joao@email.com",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 2,
+          nome: "Maria Santos",
+          telefone: "(11) 88888-8888",
+          email: "maria@email.com",
+          data_cadastro: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem('oficina_clientes', JSON.stringify(clientesExemplo));
+
+      const veiculosExemplo = [
+        {
+          id: 1,
+          cliente_id: 1,
+          marca: "Ford",
+          modelo: "Fiesta",
+          ano: 2020,
+          placa: "ABC-1234",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 2,
+          cliente_id: 2,
+          marca: "Chevrolet",
+          modelo: "Onix",
+          ano: 2021,
+          placa: "XYZ-5678",
+          data_cadastro: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem('oficina_veiculos', JSON.stringify(veiculosExemplo));
+
+      const defeitosExemplo = [
+        {
+          id: 1,
+          descricao: "Problema no motor - ruído estranho",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 2,
+          descricao: "Freios fazendo barulho",
+          data_cadastro: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem('oficina_defeitos', JSON.stringify(defeitosExemplo));
+
+      const servicosExemplo = [
+        {
+          id: 1,
+          cliente_id: 1,
+          veiculo_id: 1,
+          defeito_id: 1,
+          servico_realizado: "Troca de óleo e filtro",
+          valor: 150.00,
+          funcionario: "Carlos Mecânico",
+          data_servico: new Date().toISOString().split('T')[0],
+          observacoes: "Serviço realizado com sucesso",
+          status: "Concluído",
+          data_cadastro: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem('oficina_servicos', JSON.stringify(servicosExemplo));
+    }
+  }
+
+  // Métodos para Clientes
+  getClientes() {
+    return JSON.parse(localStorage.getItem('oficina_clientes') || '[]');
+  }
+
+  addCliente(cliente) {
+    const clientes = this.getClientes();
+    const novoId = Math.max(...clientes.map(c => c.id), 0) + 1;
+    const novoCliente = {
+      ...cliente,
+      id: novoId,
+      data_cadastro: new Date().toISOString()
+    };
+    clientes.push(novoCliente);
+    localStorage.setItem('oficina_clientes', JSON.stringify(clientes));
+    return novoCliente;
+  }
+
+  // Métodos para Veículos
+  getVeiculos() {
+    const veiculos = JSON.parse(localStorage.getItem('oficina_veiculos') || '[]');
+    const clientes = this.getClientes();
+    
+    return veiculos.map(veiculo => {
+      const cliente = clientes.find(c => c.id == veiculo.cliente_id);
+      return {
+        ...veiculo,
+        cliente_nome: cliente ? cliente.nome : 'Cliente não encontrado'
+      };
+    });
+  }
+
+  addVeiculo(veiculo) {
+    const veiculos = JSON.parse(localStorage.getItem('oficina_veiculos') || '[]');
+    const novoId = Math.max(...veiculos.map(v => v.id), 0) + 1;
+    const novoVeiculo = {
+      ...veiculo,
+      id: novoId,
+      data_cadastro: new Date().toISOString()
+    };
+    veiculos.push(novoVeiculo);
+    localStorage.setItem('oficina_veiculos', JSON.stringify(veiculos));
+    return novoVeiculo;
+  }
+
+  // Métodos para Defeitos
+  getDefeitos() {
+    return JSON.parse(localStorage.getItem('oficina_defeitos') || '[]');
+  }
+
+  addDefeito(defeito) {
+    const defeitos = this.getDefeitos();
+    const novoId = Math.max(...defeitos.map(d => d.id), 0) + 1;
+    const novoDefeito = {
+      ...defeito,
+      id: novoId,
+      data_cadastro: new Date().toISOString()
+    };
+    defeitos.push(novoDefeito);
+    localStorage.setItem('oficina_defeitos', JSON.stringify(defeitos));
+    return novoDefeito;
+  }
+
+  // Métodos para Serviços
+  getServicos() {
+    const servicos = JSON.parse(localStorage.getItem('oficina_servicos') || '[]');
+    const clientes = this.getClientes();
+    const veiculos = JSON.parse(localStorage.getItem('oficina_veiculos') || '[]');
+    const defeitos = this.getDefeitos();
+    
+    return servicos.map(servico => {
+      const cliente = clientes.find(c => c.id == servico.cliente_id);
+      const veiculo = veiculos.find(v => v.id == servico.veiculo_id);
+      const defeito = defeitos.find(d => d.id == servico.defeito_id);
+      
+      return {
+        ...servico,
+        cliente_nome: cliente ? cliente.nome : 'N/A',
+        marca: veiculo ? veiculo.marca : 'N/A',
+        modelo: veiculo ? veiculo.modelo : 'N/A',
+        placa: veiculo ? veiculo.placa : 'N/A',
+        defeito_descricao: defeito ? defeito.descricao : 'N/A'
+      };
+    });
+  }
+
+  addServico(servico) {
+    const servicos = JSON.parse(localStorage.getItem('oficina_servicos') || '[]');
+    const novoId = Math.max(...servicos.map(s => s.id), 0) + 1;
+    const novoServico = {
+      ...servico,
+      id: novoId,
+      status: 'Concluído',
+      data_cadastro: new Date().toISOString()
+    };
+    servicos.push(novoServico);
+    localStorage.setItem('oficina_servicos', JSON.stringify(servicos));
+    return novoServico;
+  }
+
+  // Estatísticas para Dashboard
+  getDashboardStats() {
+    const clientes = this.getClientes();
+    const veiculos = this.getVeiculos();
+    const servicos = this.getServicos();
+    
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const servicosMes = servicos.filter(s => s.data_servico.startsWith(currentMonth));
+    const faturamentoMes = servicosMes.reduce((total, s) => total + parseFloat(s.valor), 0);
+    
+    return {
+      clientes: clientes.length,
+      veiculos: veiculos.length,
+      servicos_mes: servicosMes.length,
+      faturamento_mes: faturamentoMes
+    };
+  }
+}
+
+// Instância global do banco de dados
+const db = new OficinaDB();
 
 // Utilitários
 const formatCurrency = (value) => {
@@ -32,29 +256,6 @@ function showMessage(message, type = 'success') {
     alert.classList.remove('visible');
     setTimeout(() => document.body.removeChild(alert), 300);
   }, 4000);
-}
-
-// Função para fazer requisições à API
-async function apiRequest(endpoint, options = {}) {
-  try {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-      },
-      ...options
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erro ${response.status}: ${response.statusText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Erro na requisição:', error);
-    showMessage(`Erro: ${error.message}`, 'error');
-    throw error;
-  }
 }
 
 // Inicialização quando o DOM estiver carregado
@@ -102,6 +303,7 @@ function initializePage() {
   
   switch (currentPage) {
     case 'index.html':
+    case '':
       loadDashboard();
       break;
     case 'cadastro_cliente.html':
@@ -146,7 +348,7 @@ function setupForms() {
   });
 }
 
-async function handleFormSubmit(e) {
+function handleFormSubmit(e) {
   e.preventDefault();
   
   const form = e.target;
@@ -157,52 +359,47 @@ async function handleFormSubmit(e) {
   form.classList.add('loading');
   
   try {
-    let endpoint = '';
+    let result = null;
     let successMessage = '';
     
     switch (form.id) {
       case 'formCliente':
-        endpoint = '/clientes';
+        result = db.addCliente(data);
         successMessage = 'Cliente cadastrado com sucesso!';
         break;
       case 'formVeiculo':
-        endpoint = '/veiculos';
+        result = db.addVeiculo(data);
         successMessage = 'Veículo cadastrado com sucesso!';
         break;
       case 'formDefeito':
-        endpoint = '/defeitos';
+        result = db.addDefeito(data);
         successMessage = 'Defeito cadastrado com sucesso!';
         break;
       case 'formServico':
-        endpoint = '/servicos';
+        result = db.addServico(data);
         successMessage = 'Serviço registrado com sucesso!';
         break;
     }
     
-    await apiRequest(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
-    
     showMessage(successMessage);
     form.reset();
     
-    // Recarregar dados se necessário
+    // Recarregar dados
     setTimeout(() => {
       initializePage();
     }, 1000);
     
   } catch (error) {
-    // Erro já tratado na função apiRequest
+    showMessage(`Erro: ${error.message}`, 'error');
   } finally {
     form.classList.remove('loading');
   }
 }
 
 // Funções específicas do Dashboard
-async function loadDashboard() {
+function loadDashboard() {
   try {
-    const stats = await apiRequest('/dashboard');
+    const stats = db.getDashboardStats();
     
     document.getElementById('totalClientes').textContent = stats.clientes || 0;
     document.getElementById('totalVeiculos').textContent = stats.veiculos || 0;
@@ -210,12 +407,13 @@ async function loadDashboard() {
     document.getElementById('faturamentoMes').textContent = formatCurrency(stats.faturamento_mes || 0);
     
     // Carregar últimos serviços
-    const services = await apiRequest('/servicos');
+    const services = db.getServicos();
     const recentServices = services.slice(0, 5);
     displayRecentServices(recentServices);
     
   } catch (error) {
     console.error('Erro ao carregar dashboard:', error);
+    showMessage('Erro ao carregar dashboard', 'error');
   }
 }
 
@@ -236,12 +434,13 @@ function displayRecentServices(services) {
 }
 
 // Funções para Clientes
-async function loadClients() {
+function loadClients() {
   try {
-    const clients = await apiRequest('/clientes');
+    const clients = db.getClientes();
     displayClients(clients);
   } catch (error) {
     console.error('Erro ao carregar clientes:', error);
+    showMessage('Erro ao carregar clientes', 'error');
   }
 }
 
@@ -259,9 +458,9 @@ function displayClients(clients) {
   `).join('');
 }
 
-async function loadClientsForSelect() {
+function loadClientsForSelect() {
   try {
-    const clients = await apiRequest('/clientes');
+    const clients = db.getClientes();
     const selects = document.querySelectorAll('select[name="cliente_id"]');
     
     selects.forEach(select => {
@@ -284,12 +483,13 @@ function toggleClientList() {
 }
 
 // Funções para Veículos
-async function loadVehicles() {
+function loadVehicles() {
   try {
-    const vehicles = await apiRequest('/veiculos');
+    const vehicles = db.getVeiculos();
     displayVehicles(vehicles);
   } catch (error) {
     console.error('Erro ao carregar veículos:', error);
+    showMessage('Erro ao carregar veículos', 'error');
   }
 }
 
@@ -320,12 +520,13 @@ function toggleVehicleList() {
 }
 
 // Funções para Defeitos
-async function loadDefects() {
+function loadDefects() {
   try {
-    const defects = await apiRequest('/defeitos');
+    const defects = db.getDefeitos();
     displayDefects(defects);
   } catch (error) {
     console.error('Erro ao carregar defeitos:', error);
+    showMessage('Erro ao carregar defeitos', 'error');
   }
 }
 
@@ -341,9 +542,9 @@ function displayDefects(defects) {
   `).join('');
 }
 
-async function loadDefectsForSelect() {
+function loadDefectsForSelect() {
   try {
-    const defects = await apiRequest('/defeitos');
+    const defects = db.getDefeitos();
     const select = document.querySelector('select[name="defeito_id"]');
     
     if (select) {
@@ -366,12 +567,13 @@ function toggleDefectList() {
 }
 
 // Funções para Serviços
-async function loadServices() {
+function loadServices() {
   try {
-    const services = await apiRequest('/servicos');
+    const services = db.getServicos();
     displayServices(services);
   } catch (error) {
     console.error('Erro ao carregar serviços:', error);
+    showMessage('Erro ao carregar serviços', 'error');
   }
 }
 
@@ -396,12 +598,12 @@ function setupClientVehicleFilter() {
   const vehicleSelect = document.querySelector('select[name="veiculo_id"]');
   
   if (clientSelect && vehicleSelect) {
-    clientSelect.addEventListener('change', async (e) => {
+    clientSelect.addEventListener('change', (e) => {
       const clientId = e.target.value;
       
       if (clientId) {
         try {
-          const vehicles = await apiRequest('/veiculos');
+          const vehicles = JSON.parse(localStorage.getItem('oficina_veiculos') || '[]');
           const clientVehicles = vehicles.filter(v => v.cliente_id == clientId);
           
           vehicleSelect.innerHTML = '<option value="">Selecione o veículo</option>' +
@@ -429,12 +631,13 @@ function toggleServiceList() {
 }
 
 // Funções para Relatórios
-async function loadAllServices() {
+function loadAllServices() {
   try {
-    const services = await apiRequest('/servicos');
+    const services = db.getServicos();
     displayAllServices(services);
   } catch (error) {
     console.error('Erro ao carregar todos os serviços:', error);
+    showMessage('Erro ao carregar serviços', 'error');
   }
 }
 
@@ -464,7 +667,7 @@ function setDefaultMonth() {
   }
 }
 
-async function generateMonthlyReport() {
+function generateMonthlyReport() {
   const monthInput = document.getElementById('monthFilter');
   const reportContent = document.getElementById('monthlyReport');
   
@@ -477,7 +680,7 @@ async function generateMonthlyReport() {
   }
   
   try {
-    const services = await apiRequest('/servicos');
+    const services = db.getServicos();
     const monthServices = services.filter(service => 
       service.data_servico.startsWith(selectedMonth)
     );
@@ -509,6 +712,7 @@ async function generateMonthlyReport() {
     
   } catch (error) {
     console.error('Erro ao gerar relatório mensal:', error);
+    showMessage('Erro ao gerar relatório', 'error');
   }
 }
 
@@ -518,5 +722,79 @@ document.addEventListener('DOMContentLoaded', () => {
   if (dataServico) {
     const today = new Date().toISOString().split('T')[0];
     dataServico.value = today;
+  }
+});
+
+// Função para exportar dados (backup)
+function exportData() {
+  const data = {
+    clientes: db.getClientes(),
+    veiculos: JSON.parse(localStorage.getItem('oficina_veiculos') || '[]'),
+    defeitos: db.getDefeitos(),
+    servicos: JSON.parse(localStorage.getItem('oficina_servicos') || '[]'),
+    exportDate: new Date().toISOString()
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `oficina-backup-${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showMessage('Backup dos dados exportado com sucesso!');
+}
+
+// Função para importar dados (restaurar backup)
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      
+      if (data.clientes) localStorage.setItem('oficina_clientes', JSON.stringify(data.clientes));
+      if (data.veiculos) localStorage.setItem('oficina_veiculos', JSON.stringify(data.veiculos));
+      if (data.defeitos) localStorage.setItem('oficina_defeitos', JSON.stringify(data.defeitos));
+      if (data.servicos) localStorage.setItem('oficina_servicos', JSON.stringify(data.servicos));
+      
+      showMessage('Dados importados com sucesso! Recarregando página...');
+      setTimeout(() => window.location.reload(), 2000);
+      
+    } catch (error) {
+      showMessage('Erro ao importar dados. Verifique o arquivo.', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Adicionar botões de backup no dashboard (se existir)
+document.addEventListener('DOMContentLoaded', () => {
+  const quickActions = document.querySelector('.actions-grid');
+  if (quickActions && window.location.pathname.includes('index.html')) {
+    const backupBtn = document.createElement('button');
+    backupBtn.className = 'action-btn';
+    backupBtn.onclick = exportData;
+    backupBtn.innerHTML = `
+      <i class="fas fa-download"></i>
+      <span>Backup Dados</span>
+    `;
+    
+    const importBtn = document.createElement('label');
+    importBtn.className = 'action-btn';
+    importBtn.style.cursor = 'pointer';
+    importBtn.innerHTML = `
+      <i class="fas fa-upload"></i>
+      <span>Restaurar Backup</span>
+      <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
+    `;
+    
+    quickActions.appendChild(backupBtn);
+    quickActions.appendChild(importBtn);
   }
 });
