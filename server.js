@@ -267,15 +267,45 @@ app.post('/api/servicos', (req, res) => {
     });
 });
 
-// Rota principal - servir index.html
+// Rotas específicas para páginas HTML (antes do catch-all)
+const htmlPages = [
+  'index.html',
+  'cadastro_cliente.html',
+  'cadastro_veiculo.html',
+  'cadastro_defeito.html',
+  'servico_realizado.html',
+  'relatorios.html'
+];
+
+htmlPages.forEach(page => {
+  app.get(`/${page}`, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', page));
+  });
+  
+  // Também servir sem a extensão .html
+  const pageName = page.replace('.html', '');
+  if (pageName !== 'index') {
+    app.get(`/${pageName}`, (req, res) => {
+      res.sendFile(path.join(__dirname, 'public', page));
+    });
+  }
+});
+
+// Rota principal
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Middleware para capturar rotas não encontradas
-app.use((req, res) => {
-  console.log(`❌ Rota não encontrada: ${req.method} ${req.url}`);
-  res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
+// Middleware para capturar todas as outras rotas e servir index.html (SPA fallback)
+app.get('*', (req, res) => {
+  // Se for uma requisição para API, retornar 404
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Endpoint não encontrado' });
+  }
+  
+  // Para todas as outras rotas, servir index.html
+  console.log(`📄 Servindo index.html para rota: ${req.path}`);
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Middleware para tratamento de erros
@@ -289,6 +319,10 @@ app.listen(PORT, () => {
   console.log(`🚀 Servidor AutoPro rodando em http://localhost:${PORT}`);
   console.log('🔧 Sistema de Oficina Mecânica iniciado com sucesso!');
   console.log('📁 Servindo arquivos da pasta: public/');
+  console.log('📄 Páginas disponíveis:');
+  htmlPages.forEach(page => {
+    console.log(`   - http://localhost:${PORT}/${page}`);
+  });
 });
 
 // Fechar banco de dados ao encerrar aplicação
