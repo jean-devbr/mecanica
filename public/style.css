@@ -123,10 +123,11 @@ body {
   background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
   color: var(--white);
   font-weight: 600;
-  padding: 0.75rem 0;
+  padding: 0.5rem 0;
   overflow: hidden;
   z-index: 1100;
   box-shadow: var(--shadow);
+  height: 40px;
 }
 
 .banner-motivacional p {
@@ -135,6 +136,8 @@ body {
   padding-left: 100%;
   animation: scroll-left 20s linear infinite;
   margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.2;
 }
 
 .banner-motivacional p:hover {
@@ -150,7 +153,7 @@ body {
 .content {
   flex-grow: 1;
   margin-left: 280px;
-  padding: 6rem 3rem 3rem;
+  padding: 4.5rem 3rem 3rem;
   min-height: 100vh;
 }
 
@@ -524,7 +527,15 @@ tbody tr:hover {
   
   .content {
     margin-left: 240px;
-    padding: 6rem 2rem 2rem;
+    padding: 4.5rem 2rem 2rem;
+  }
+  
+  .logo h2 {
+    font-size: 1.5rem;
+  }
+  
+  .logo i {
+    font-size: 2rem;
   }
 }
 
@@ -538,14 +549,6 @@ tbody tr:hover {
   
   .logo {
     margin-bottom: 1rem;
-  }
-  
-  .logo h2 {
-    font-size: 1.5rem;
-  }
-  
-  .logo i {
-    font-size: 2rem;
   }
   
   .sidebar nav {
@@ -562,7 +565,16 @@ tbody tr:hover {
   
   .content {
     margin-left: 0;
-    padding: 5rem 1rem 2rem;
+    padding: 4rem 1rem 2rem;
+  }
+  
+  .banner-motivacional {
+    height: 35px;
+    padding: 0.375rem 0;
+  }
+  
+  .banner-motivacional p {
+    font-size: 0.8rem;
   }
   
   .stats-grid {
@@ -599,11 +611,16 @@ tbody tr:hover {
   }
   
   .banner-motivacional {
-    font-size: 0.875rem;
+    height: 30px;
+    padding: 0.25rem 0;
+  }
+  
+  .banner-motivacional p {
+    font-size: 0.75rem;
   }
   
   .content {
-    padding: 4rem 0.75rem 1rem;
+    padding: 3.5rem 0.75rem 1rem;
   }
   
   form {
