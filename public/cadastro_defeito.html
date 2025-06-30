@@ -56,12 +56,80 @@
     <div class="form-container">
       <form id="formDefeito">
         <div class="form-group">
+          <label for="cliente_id">
+            <i class="fas fa-user"></i>
+            Cliente (Opcional)
+          </label>
+          <select id="cliente_id" name="cliente_id">
+            <option value="">Selecione o cliente (opcional)</option>
+          </select>
+          <small style="color: var(--gray-500); margin-top: 0.25rem; font-size: 0.875rem;">
+            Associe o defeito a um cliente específico ou deixe em branco para defeito geral
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="veiculo_id">
+            <i class="fas fa-car"></i>
+            Veículo (Opcional)
+          </label>
+          <select id="veiculo_id" name="veiculo_id">
+            <option value="">Selecione o veículo (opcional)</option>
+          </select>
+          <small style="color: var(--gray-500); margin-top: 0.25rem; font-size: 0.875rem;">
+            Selecione primeiro um cliente para ver seus veículos
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="categoria">
+            <i class="fas fa-tags"></i>
+            Categoria do Defeito
+          </label>
+          <select id="categoria" name="categoria" required>
+            <option value="">Selecione a categoria</option>
+            <option value="Motor">🔧 Motor</option>
+            <option value="Freios">🛑 Freios</option>
+            <option value="Suspensão">🚗 Suspensão</option>
+            <option value="Elétrica">⚡ Sistema Elétrico</option>
+            <option value="Transmissão">⚙️ Transmissão</option>
+            <option value="Ar Condicionado">❄️ Ar Condicionado</option>
+            <option value="Pneus">🛞 Pneus e Rodas</option>
+            <option value="Carroceria">🚙 Carroceria</option>
+            <option value="Outros">🔧 Outros</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="prioridade">
+            <i class="fas fa-exclamation"></i>
+            Prioridade
+          </label>
+          <select id="prioridade" name="prioridade" required>
+            <option value="">Selecione a prioridade</option>
+            <option value="Baixa">🟢 Baixa</option>
+            <option value="Média">🟡 Média</option>
+            <option value="Alta">🟠 Alta</option>
+            <option value="Urgente">🔴 Urgente</option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="descricao">
             <i class="fas fa-clipboard-list"></i>
             Descrição do Defeito
           </label>
           <textarea id="descricao" name="descricao" rows="4" required 
-                    placeholder="Descreva detalhadamente o defeito ou problema relatado pelo cliente"></textarea>
+                    placeholder="Descreva detalhadamente o defeito ou problema relatado pelo cliente. Inclua sintomas, quando ocorre, frequência, etc."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="observacoes">
+            <i class="fas fa-sticky-note"></i>
+            Observações Técnicas
+          </label>
+          <textarea id="observacoes" name="observacoes" rows="2" 
+                    placeholder="Observações técnicas, diagnóstico inicial, peças necessárias, etc. (opcional)"></textarea>
         </div>
 
         <button type="submit" class="btn-primary">
@@ -77,8 +145,13 @@
         <table id="defeitosTable">
           <thead>
             <tr>
+              <th>Cliente</th>
+              <th>Veículo</th>
+              <th>Categoria</th>
+              <th>Prioridade</th>
               <th>Descrição</th>
               <th>Data Cadastro</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>

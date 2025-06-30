@@ -44,6 +44,13 @@ class OficinaDB {
           telefone: "(11) 88888-8888",
           email: "maria@email.com",
           data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 3,
+          nome: "Carlos Oliveira",
+          telefone: "(11) 77777-7777",
+          email: "carlos@email.com",
+          data_cadastro: new Date().toISOString()
         }
       ];
       localStorage.setItem('oficina_clientes', JSON.stringify(clientesExemplo));
@@ -66,6 +73,15 @@ class OficinaDB {
           ano: 2021,
           placa: "XYZ-5678",
           data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 3,
+          cliente_id: 3,
+          marca: "Volkswagen",
+          modelo: "Gol",
+          ano: 2019,
+          placa: "DEF-9012",
+          data_cadastro: new Date().toISOString()
         }
       ];
       localStorage.setItem('oficina_veiculos', JSON.stringify(veiculosExemplo));
@@ -73,12 +89,35 @@ class OficinaDB {
       const defeitosExemplo = [
         {
           id: 1,
-          descricao: "Problema no motor - ruído estranho",
+          cliente_id: 1,
+          veiculo_id: 1,
+          categoria: "Motor",
+          prioridade: "Alta",
+          descricao: "Motor fazendo ruído estranho ao acelerar, principalmente em subidas",
+          observacoes: "Verificar correia dentada e tensor",
+          status: "Pendente",
           data_cadastro: new Date().toISOString()
         },
         {
           id: 2,
-          descricao: "Freios fazendo barulho",
+          cliente_id: 2,
+          veiculo_id: 2,
+          categoria: "Freios",
+          prioridade: "Urgente",
+          descricao: "Freios fazendo barulho alto e pedal está mole",
+          observacoes: "Possível troca de pastilhas e sangria do sistema",
+          status: "Pendente",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 3,
+          cliente_id: null,
+          veiculo_id: null,
+          categoria: "Elétrica",
+          prioridade: "Média",
+          descricao: "Problema comum em sistemas de ignição - falha na partida",
+          observacoes: "Defeito geral para referência",
+          status: "Resolvido",
           data_cadastro: new Date().toISOString()
         }
       ];
@@ -90,11 +129,11 @@ class OficinaDB {
           cliente_id: 1,
           veiculo_id: 1,
           defeito_id: 1,
-          servico_realizado: "Troca de óleo e filtro",
+          servico_realizado: "Troca de óleo e filtro + verificação do motor",
           valor: 150.00,
           funcionario: "Carlos Mecânico",
           data_servico: new Date().toISOString().split('T')[0],
-          observacoes: "Serviço realizado com sucesso",
+          observacoes: "Serviço realizado com sucesso, motor normalizado",
           status: "Concluído",
           data_cadastro: new Date().toISOString()
         }
@@ -148,18 +187,35 @@ class OficinaDB {
     return novoVeiculo;
   }
 
-  // Métodos para Defeitos
+  // Métodos para Defeitos (ATUALIZADO)
   getDefeitos() {
-    return JSON.parse(localStorage.getItem('oficina_defeitos') || '[]');
+    const defeitos = JSON.parse(localStorage.getItem('oficina_defeitos') || '[]');
+    const clientes = this.getClientes();
+    const veiculos = JSON.parse(localStorage.getItem('oficina_veiculos') || '[]');
+    
+    return defeitos.map(defeito => {
+      const cliente = clientes.find(c => c.id == defeito.cliente_id);
+      const veiculo = veiculos.find(v => v.id == defeito.veiculo_id);
+      
+      return {
+        ...defeito,
+        cliente_nome: cliente ? cliente.nome : 'Geral',
+        veiculo_info: veiculo ? `${veiculo.marca} ${veiculo.modelo} (${veiculo.placa || 'S/P'})` : 'N/A'
+      };
+    });
   }
 
   addDefeito(defeito) {
-    const defeitos = this.getDefeitos();
+    const defeitos = JSON.parse(localStorage.getItem('oficina_defeitos') || '[]');
     const novoId = Math.max(...defeitos.map(d => d.id), 0) + 1;
     const novoDefeito = {
       ...defeito,
       id: novoId,
-      data_cadastro: new Date().toISOString()
+      status: 'Pendente',
+      data_cadastro: new Date().toISOString(),
+      // Converter strings vazias para null
+      cliente_id: defeito.cliente_id || null,
+      veiculo_id: defeito.veiculo_id || null
     };
     defeitos.push(novoDefeito);
     localStorage.setItem('oficina_defeitos', JSON.stringify(defeitos));
@@ -314,7 +370,9 @@ function initializePage() {
       loadVehicles();
       break;
     case 'cadastro_defeito.html':
+      loadClientsForSelect();
       loadDefects();
+      setupDefectClientVehicleFilter();
       break;
     case 'servico_realizado.html':
       loadClientsForSelect();
@@ -519,7 +577,7 @@ function toggleVehicleList() {
   }
 }
 
-// Funções para Defeitos
+// Funções para Defeitos (ATUALIZADAS)
 function loadDefects() {
   try {
     const defects = db.getDefeitos();
@@ -534,12 +592,32 @@ function displayDefects(defects) {
   const tbody = document.querySelector('#defeitosTable tbody');
   if (!tbody) return;
   
-  tbody.innerHTML = defects.map(defect => `
-    <tr>
-      <td>${defect.descricao}</td>
-      <td>${formatDateTime(defect.data_cadastro)}</td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = defects.map(defect => {
+    const prioridadeClass = {
+      'Baixa': 'background: #27ae60; color: white;',
+      'Média': 'background: #f39c12; color: white;',
+      'Alta': 'background: #e67e22; color: white;',
+      'Urgente': 'background: #e74c3c; color: white;'
+    };
+    
+    const statusClass = {
+      'Pendente': 'background: #f39c12; color: white;',
+      'Em Andamento': 'background: #3498db; color: white;',
+      'Resolvido': 'background: #27ae60; color: white;'
+    };
+    
+    return `
+      <tr>
+        <td>${defect.cliente_nome || 'Geral'}</td>
+        <td>${defect.veiculo_info || 'N/A'}</td>
+        <td><span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">${defect.categoria}</span></td>
+        <td><span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; ${prioridadeClass[defect.prioridade] || ''}">${defect.prioridade}</span></td>
+        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${defect.descricao}">${defect.descricao}</td>
+        <td>${formatDateTime(defect.data_cadastro)}</td>
+        <td><span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; ${statusClass[defect.status] || ''}">${defect.status}</span></td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function loadDefectsForSelect() {
@@ -549,10 +627,37 @@ function loadDefectsForSelect() {
     
     if (select) {
       select.innerHTML = '<option value="">Selecione o defeito (opcional)</option>' +
-        defects.map(defect => `<option value="${defect.id}">${defect.descricao}</option>`).join('');
+        defects.map(defect => `<option value="${defect.id}">${defect.categoria} - ${defect.descricao.substring(0, 50)}${defect.descricao.length > 50 ? '...' : ''}</option>`).join('');
     }
   } catch (error) {
     console.error('Erro ao carregar defeitos para select:', error);
+  }
+}
+
+function setupDefectClientVehicleFilter() {
+  const clientSelect = document.querySelector('select[name="cliente_id"]');
+  const vehicleSelect = document.querySelector('select[name="veiculo_id"]');
+  
+  if (clientSelect && vehicleSelect) {
+    clientSelect.addEventListener('change', (e) => {
+      const clientId = e.target.value;
+      
+      if (clientId) {
+        try {
+          const vehicles = JSON.parse(localStorage.getItem('oficina_veiculos') || '[]');
+          const clientVehicles = vehicles.filter(v => v.cliente_id == clientId);
+          
+          vehicleSelect.innerHTML = '<option value="">Selecione o veículo (opcional)</option>' +
+            clientVehicles.map(vehicle => 
+              `<option value="${vehicle.id}">${vehicle.marca} ${vehicle.modelo} (${vehicle.placa || 'S/P'})</option>`
+            ).join('');
+        } catch (error) {
+          console.error('Erro ao carregar veículos do cliente:', error);
+        }
+      } else {
+        vehicleSelect.innerHTML = '<option value="">Selecione o veículo (opcional)</option>';
+      }
+    });
   }
 }
 
@@ -730,7 +835,7 @@ function exportData() {
   const data = {
     clientes: db.getClientes(),
     veiculos: JSON.parse(localStorage.getItem('oficina_veiculos') || '[]'),
-    defeitos: db.getDefeitos(),
+    defeitos: JSON.parse(localStorage.getItem('oficina_defeitos') || '[]'),
     servicos: JSON.parse(localStorage.getItem('oficina_servicos') || '[]'),
     exportDate: new Date().toISOString()
   };
