@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Consultas - Oficina AutoPro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fas fa-wrench"></i>
+      <h2>AutoPro</h2>
+    </div>
+    <nav>
+      <a href="index.html">
+        <i class="fas fa-tachometer-alt"></i>
+        Dashboard
+      </a>
+      <a href="cadastro_cliente.html">
+        <i class="fas fa-users"></i>
+        Clientes
+      </a>
+      <a href="cadastro_veiculo.html">
+        <i class="fas fa-car"></i>
+        Veículos
+      </a>
+      <a href="cadastro_defeito.html">
+        <i class="fas fa-exclamation-triangle"></i>
+        Defeitos
+      </a>
+      <a href="servico_realizado.html">
+        <i class="fas fa-tools"></i>
+        Serviços
+      </a>
+      <a href="relatorios.html">
+        <i class="fas fa-chart-bar"></i>
+        Relatórios
+      </a>
+      <a href="consultas.html" class="active">
+        <i class="fas fa-search"></i>
+        Consultas
+      </a>
+    </nav>
+  </aside>
+
+  <div class="banner-motivacional">
+    <p>🔧 Oficina AutoPro - Excelência em cada serviço! Transformando problemas em soluções. 🚗💨</p>
+  </div>
+
+  <main class="content">
+    <div class="page-header">
+      <h1><i class="fas fa-search"></i> Sistema de Consultas</h1>
+      <div class="search-stats">
+        <span id="totalResults">0 resultados encontrados</span>
+      </div>
+    </div>
+
+    <!-- Seção de Pesquisa -->
+    <div class="search-section">
+      <div class="search-container">
+        <h2><i class="fas fa-filter"></i> Filtros de Pesquisa</h2>
+        
+        <div class="search-filters">
+          <div class="filter-group">
+            <label for="searchType">
+              <i class="fas fa-list"></i>
+              Tipo de Consulta
+            </label>
+            <select id="searchType" onchange="toggleSearchOptions()">
+              <option value="cliente">🔍 Pesquisar por Cliente</option>
+              <option value="servico">🔧 Pesquisar por Serviço</option>
+              <option value="veiculo">🚗 Pesquisar por Veículo</option>
+              <option value="periodo">📅 Pesquisar por Período</option>
+            </select>
+          </div>
+
+          <!-- Pesquisa por Cliente -->
+          <div id="clienteSearch" class="search-option active">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label for="clienteNome">
+                  <i class="fas fa-user"></i>
+                  Nome do Cliente
+                </label>
+                <input type="text" id="clienteNome" placeholder="Digite o nome do cliente..." onkeyup="searchClientes()">
+              </div>
+              <div class="filter-group">
+                <label for="clienteStatus">
+                  <i class="fas fa-flag"></i>
+                  Status dos Serviços
+                </label>
+                <select id="clienteStatus" onchange="searchClientes()">
+                  <option value="">Todos os Status</option>
+                  <option value="Pendente">⏳ Pendente</option>
+                  <option value="Em Andamento">🔄 Em Andamento</option>
+                  <option value="Realizado">✅ Realizado</option>
+                  <option value="Cancelado">❌ Cancelado</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pesquisa por Serviço -->
+          <div id="servicoSearch" class="search-option">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label for="servicoTipo">
+                  <i class="fas fa-tools"></i>
+                  Tipo de Serviço
+                </label>
+                <select id="servicoTipo" onchange="searchServicos()">
+                  <option value="">Todos os Tipos</option>
+                  <option value="Preventiva">🔧 Manutenção Preventiva</option>
+                  <option value="Corretiva">⚠️ Manutenção Corretiva</option>
+                  <option value="Emergencial">🚨 Serviço Emergencial</option>
+                  <option value="Revisão">📋 Revisão Programada</option>
+                  <option value="Diagnóstico">🔍 Diagnóstico</option>
+                  <option value="Instalação">⚙️ Instalação de Peças</option>
+                  <option value="Customização">🎨 Customização</option>
+                  <option value="Outros">🔧 Outros Serviços</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="servicoDescricao">
+                  <i class="fas fa-clipboard-list"></i>
+                  Descrição do Serviço
+                </label>
+                <input type="text" id="servicoDescricao" placeholder="Digite palavras-chave do serviço..." onkeyup="searchServicos()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Pesquisa por Veículo -->
+          <div id="veiculoSearch" class="search-option">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label for="veiculoMarca">
+                  <i class="fas fa-industry"></i>
+                  Marca do Veículo
+                </label>
+                <input type="text" id="veiculoMarca" placeholder="Ex: Ford, Chevrolet..." onkeyup="searchVeiculos()">
+              </div>
+              <div class="filter-group">
+                <label for="veiculoModelo">
+                  <i class="fas fa-car-side"></i>
+                  Modelo do Veículo
+                </label>
+                <input type="text" id="veiculoModelo" placeholder="Ex: Fiesta, Onix..." onkeyup="searchVeiculos()">
+              </div>
+            </div>
+            <div class="filter-row">
+              <div class="filter-group">
+                <label for="veiculoPlaca">
+                  <i class="fas fa-id-card"></i>
+                  Placa do Veículo
+                </label>
+                <input type="text" id="veiculoPlaca" placeholder="ABC-1234" onkeyup="searchVeiculos()">
+              </div>
+              <div class="filter-group">
+                <label for="veiculoAno">
+                  <i class="fas fa-calendar"></i>
+                  Ano do Veículo
+                </label>
+                <input type="number" id="veiculoAno" placeholder="2020" min="1900" max="2099" onchange="searchVeiculos()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Pesquisa por Período -->
+          <div id="periodoSearch" class="search-option">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label for="dataInicio">
+                  <i class="fas fa-calendar-alt"></i>
+                  Data Inicial
+                </label>
+                <input type="date" id="dataInicio" onchange="searchPeriodo()">
+              </div>
+              <div class="filter-group">
+                <label for="dataFim">
+                  <i class="fas fa-calendar-check"></i>
+                  Data Final
+                </label>
+                <input type="date" id="dataFim" onchange="searchPeriodo()">
+              </div>
+            </div>
+          </div>
+
+          <div class="search-actions">
+            <button class="btn-primary" onclick="executeSearch()">
+              <i class="fas fa-search"></i>
+              Pesquisar
+            </button>
+            <button class="btn-secondary" onclick="clearSearch()">
+              <i class="fas fa-eraser"></i>
+              Limpar Filtros
+            </button>
+            <button class="btn-secondary" onclick="exportResults()">
+              <i class="fas fa-download"></i>
+              Exportar Resultados
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção de Resultados -->
+    <div class="results-section">
+      <div class="results-header">
+        <h2><i class="fas fa-list-ul"></i> Resultados da Pesquisa</h2>
+        <div class="results-actions">
+          <button class="btn-secondary" onclick="toggleResultsView()">
+            <i class="fas fa-th-list" id="viewToggleIcon"></i>
+            <span id="viewToggleText">Visualização Detalhada</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Resultados em Cards (Padrão) -->
+      <div id="cardResults" class="results-cards">
+        <div class="no-results">
+          <i class="fas fa-search"></i>
+          <h3>Nenhuma pesquisa realizada</h3>
+          <p>Use os filtros acima para encontrar clientes, serviços ou veículos</p>
+        </div>
+      </div>
+
+      <!-- Resultados em Tabela -->
+      <div id="tableResults" class="results-table" style="display: none;">
+        <div class="table-container">
+          <table id="searchResultsTable">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Veículo</th>
+                <th>Serviço</th>
+                <th>Tipo</th>
+                <th>Valor</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Funcionário</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Resultados carregados via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção de Estatísticas dos Resultados -->
+    <div id="searchStats" class="search-statistics" style="display: none;">
+      <h2><i class="fas fa-chart-pie"></i> Estatísticas dos Resultados</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="statsClientes">0</h3>
+            <p>Clientes Encontrados</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-tools"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="statsServicos">0</h3>
+            <p>Serviços Encontrados</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="statsValor">R$ 0,00</h3>
+            <p>Valor Total</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="statsRealizados">0</h3>
+            <p>Serviços Realizados</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

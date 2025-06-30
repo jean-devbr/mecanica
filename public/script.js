@@ -51,6 +51,20 @@ class OficinaDB {
           telefone: "(11) 77777-7777",
           email: "carlos@email.com",
           data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 4,
+          nome: "Ana Costa",
+          telefone: "(11) 66666-6666",
+          email: "ana@email.com",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 5,
+          nome: "Pedro Almeida",
+          telefone: "(11) 55555-5555",
+          email: "pedro@email.com",
+          data_cadastro: new Date().toISOString()
         }
       ];
       localStorage.setItem('oficina_clientes', JSON.stringify(clientesExemplo));
@@ -81,6 +95,24 @@ class OficinaDB {
           modelo: "Gol",
           ano: 2019,
           placa: "DEF-9012",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 4,
+          cliente_id: 4,
+          marca: "Toyota",
+          modelo: "Corolla",
+          ano: 2022,
+          placa: "GHI-3456",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 5,
+          cliente_id: 5,
+          marca: "Honda",
+          modelo: "Civic",
+          ano: 2021,
+          placa: "JKL-7890",
           data_cadastro: new Date().toISOString()
         }
       ];
@@ -167,6 +199,36 @@ class OficinaDB {
           prazo_entrega: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           observacoes: "Revisão agendada conforme manual do fabricante",
           status: "Pendente",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 4,
+          cliente_id: 4,
+          veiculo_id: 4,
+          defeito_id: null,
+          marca_servico: "Diagnóstico",
+          servico_realizado: "Diagnóstico completo do sistema elétrico",
+          valor: 120.00,
+          funcionario: "João Eletricista",
+          data_servico: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          prazo_entrega: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          observacoes: "Sistema elétrico funcionando perfeitamente",
+          status: "Realizado",
+          data_cadastro: new Date().toISOString()
+        },
+        {
+          id: 5,
+          cliente_id: 5,
+          veiculo_id: 5,
+          defeito_id: null,
+          marca_servico: "Emergencial",
+          servico_realizado: "Reparo emergencial na embreagem",
+          valor: 450.00,
+          funcionario: "Carlos Mecânico",
+          data_servico: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          prazo_entrega: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          observacoes: "Embreagem substituída com urgência",
+          status: "Realizado",
           data_cadastro: new Date().toISOString()
         }
       ];
@@ -310,6 +372,54 @@ class OficinaDB {
       faturamento_mes: faturamentoMes
     };
   }
+
+  // Métodos de pesquisa para o sistema de consultas
+  searchClientesByName(nome, status = '') {
+    const servicos = this.getServicos();
+    const clientes = this.getClientes();
+    
+    let results = servicos.filter(servico => {
+      const matchNome = !nome || servico.cliente_nome.toLowerCase().includes(nome.toLowerCase());
+      const matchStatus = !status || servico.status === status;
+      return matchNome && matchStatus;
+    });
+    
+    return results;
+  }
+
+  searchServicosByType(tipo, descricao = '') {
+    const servicos = this.getServicos();
+    
+    return servicos.filter(servico => {
+      const matchTipo = !tipo || servico.marca_servico === tipo;
+      const matchDescricao = !descricao || servico.servico_realizado.toLowerCase().includes(descricao.toLowerCase());
+      return matchTipo && matchDescricao;
+    });
+  }
+
+  searchVeiculos(marca = '', modelo = '', placa = '', ano = '') {
+    const servicos = this.getServicos();
+    
+    return servicos.filter(servico => {
+      const matchMarca = !marca || servico.marca.toLowerCase().includes(marca.toLowerCase());
+      const matchModelo = !modelo || servico.modelo.toLowerCase().includes(modelo.toLowerCase());
+      const matchPlaca = !placa || (servico.placa && servico.placa.toLowerCase().includes(placa.toLowerCase()));
+      const matchAno = !ano || (servico.ano && servico.ano.toString() === ano.toString());
+      return matchMarca && matchModelo && matchPlaca && matchAno;
+    });
+  }
+
+  searchByPeriod(dataInicio, dataFim) {
+    const servicos = this.getServicos();
+    
+    return servicos.filter(servico => {
+      const dataServico = new Date(servico.data_servico);
+      const inicio = dataInicio ? new Date(dataInicio) : new Date('1900-01-01');
+      const fim = dataFim ? new Date(dataFim) : new Date('2099-12-31');
+      
+      return dataServico >= inicio && dataServico <= fim;
+    });
+  }
 }
 
 // Instância global do banco de dados
@@ -417,6 +527,9 @@ function initializePage() {
     case 'relatorios.html':
       loadAllServices();
       setDefaultMonth();
+      break;
+    case 'consultas.html':
+      initializeSearchPage();
       break;
   }
 }
@@ -875,6 +988,370 @@ function generateMonthlyReport() {
   } catch (error) {
     console.error('Erro ao gerar relatório mensal:', error);
     showMessage('Erro ao gerar relatório', 'error');
+  }
+}
+
+// FUNÇÕES DO SISTEMA DE CONSULTAS
+
+// Variáveis globais para o sistema de consultas
+let currentSearchResults = [];
+let isTableView = false;
+
+// Inicializar página de consultas
+function initializeSearchPage() {
+  // Configurar eventos de pesquisa em tempo real
+  setupSearchEvents();
+  
+  // Mostrar mensagem inicial
+  updateResultsCount(0);
+}
+
+function setupSearchEvents() {
+  // Pesquisa por cliente em tempo real
+  const clienteNome = document.getElementById('clienteNome');
+  if (clienteNome) {
+    clienteNome.addEventListener('input', debounce(searchClientes, 300));
+  }
+  
+  // Pesquisa por serviço em tempo real
+  const servicoDescricao = document.getElementById('servicoDescricao');
+  if (servicoDescricao) {
+    servicoDescricao.addEventListener('input', debounce(searchServicos, 300));
+  }
+  
+  // Pesquisas por veículo em tempo real
+  ['veiculoMarca', 'veiculoModelo', 'veiculoPlaca'].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('input', debounce(searchVeiculos, 300));
+    }
+  });
+}
+
+// Função debounce para evitar muitas chamadas
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Alternar entre tipos de pesquisa
+function toggleSearchOptions() {
+  const searchType = document.getElementById('searchType').value;
+  const options = document.querySelectorAll('.search-option');
+  
+  options.forEach(option => option.classList.remove('active'));
+  document.getElementById(searchType + 'Search').classList.add('active');
+  
+  // Limpar resultados ao trocar tipo
+  clearSearchResults();
+}
+
+// Pesquisar clientes
+function searchClientes() {
+  const nome = document.getElementById('clienteNome').value;
+  const status = document.getElementById('clienteStatus').value;
+  
+  if (!nome && !status) {
+    clearSearchResults();
+    return;
+  }
+  
+  try {
+    const results = db.searchClientesByName(nome, status);
+    currentSearchResults = results;
+    displaySearchResults(results, 'cliente');
+    updateResultsCount(results.length);
+    updateSearchStats(results);
+  } catch (error) {
+    console.error('Erro na pesquisa de clientes:', error);
+    showMessage('Erro ao pesquisar clientes', 'error');
+  }
+}
+
+// Pesquisar serviços
+function searchServicos() {
+  const tipo = document.getElementById('servicoTipo').value;
+  const descricao = document.getElementById('servicoDescricao').value;
+  
+  if (!tipo && !descricao) {
+    clearSearchResults();
+    return;
+  }
+  
+  try {
+    const results = db.searchServicosByType(tipo, descricao);
+    currentSearchResults = results;
+    displaySearchResults(results, 'servico');
+    updateResultsCount(results.length);
+    updateSearchStats(results);
+  } catch (error) {
+    console.error('Erro na pesquisa de serviços:', error);
+    showMessage('Erro ao pesquisar serviços', 'error');
+  }
+}
+
+// Pesquisar veículos
+function searchVeiculos() {
+  const marca = document.getElementById('veiculoMarca').value;
+  const modelo = document.getElementById('veiculoModelo').value;
+  const placa = document.getElementById('veiculoPlaca').value;
+  const ano = document.getElementById('veiculoAno').value;
+  
+  if (!marca && !modelo && !placa && !ano) {
+    clearSearchResults();
+    return;
+  }
+  
+  try {
+    const results = db.searchVeiculos(marca, modelo, placa, ano);
+    currentSearchResults = results;
+    displaySearchResults(results, 'veiculo');
+    updateResultsCount(results.length);
+    updateSearchStats(results);
+  } catch (error) {
+    console.error('Erro na pesquisa de veículos:', error);
+    showMessage('Erro ao pesquisar veículos', 'error');
+  }
+}
+
+// Pesquisar por período
+function searchPeriodo() {
+  const dataInicio = document.getElementById('dataInicio').value;
+  const dataFim = document.getElementById('dataFim').value;
+  
+  if (!dataInicio && !dataFim) {
+    clearSearchResults();
+    return;
+  }
+  
+  try {
+    const results = db.searchByPeriod(dataInicio, dataFim);
+    currentSearchResults = results;
+    displaySearchResults(results, 'periodo');
+    updateResultsCount(results.length);
+    updateSearchStats(results);
+  } catch (error) {
+    console.error('Erro na pesquisa por período:', error);
+    showMessage('Erro ao pesquisar por período', 'error');
+  }
+}
+
+// Executar pesquisa (botão pesquisar)
+function executeSearch() {
+  const searchType = document.getElementById('searchType').value;
+  
+  switch (searchType) {
+    case 'cliente':
+      searchClientes();
+      break;
+    case 'servico':
+      searchServicos();
+      break;
+    case 'veiculo':
+      searchVeiculos();
+      break;
+    case 'periodo':
+      searchPeriodo();
+      break;
+  }
+}
+
+// Exibir resultados da pesquisa
+function displaySearchResults(results, type) {
+  const cardResults = document.getElementById('cardResults');
+  const tableResults = document.getElementById('tableResults');
+  
+  if (results.length === 0) {
+    cardResults.innerHTML = `
+      <div class="no-results">
+        <i class="fas fa-search"></i>
+        <h3>Nenhum resultado encontrado</h3>
+        <p>Tente ajustar os filtros de pesquisa</p>
+      </div>
+    `;
+    tableResults.querySelector('tbody').innerHTML = '';
+    return;
+  }
+  
+  // Exibir em cards
+  cardResults.innerHTML = results.map(result => createResultCard(result)).join('');
+  
+  // Exibir em tabela
+  const tbody = tableResults.querySelector('tbody');
+  tbody.innerHTML = results.map(result => createResultTableRow(result)).join('');
+  
+  // Mostrar seção de estatísticas
+  document.getElementById('searchStats').style.display = 'block';
+}
+
+// Criar card de resultado
+function createResultCard(result) {
+  const statusClass = {
+    'Pendente': 'status-pending',
+    'Em Andamento': 'status-progress',
+    'Realizado': 'status-completed',
+    'Cancelado': 'status-cancelled'
+  };
+  
+  return `
+    <div class="result-card">
+      <div class="result-header">
+        <h3><i class="fas fa-user"></i> ${result.cliente_nome}</h3>
+        <span class="result-status ${statusClass[result.status] || ''}">${result.status}</span>
+      </div>
+      <div class="result-body">
+        <div class="result-info">
+          <p><i class="fas fa-car"></i> <strong>Veículo:</strong> ${result.marca} ${result.modelo} (${result.placa || 'S/P'})</p>
+          <p><i class="fas fa-tools"></i> <strong>Serviço:</strong> ${result.servico_realizado}</p>
+          <p><i class="fas fa-tag"></i> <strong>Tipo:</strong> ${result.marca_servico}</p>
+          <p><i class="fas fa-calendar"></i> <strong>Data:</strong> ${formatDate(result.data_servico)}</p>
+          <p><i class="fas fa-dollar-sign"></i> <strong>Valor:</strong> ${formatCurrency(result.valor)}</p>
+          <p><i class="fas fa-user-tie"></i> <strong>Funcionário:</strong> ${result.funcionario}</p>
+        </div>
+        ${result.observacoes ? `<div class="result-notes"><i class="fas fa-sticky-note"></i> ${result.observacoes}</div>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+// Criar linha da tabela de resultado
+function createResultTableRow(result) {
+  const statusClass = {
+    'Pendente': 'background: #f39c12; color: white;',
+    'Em Andamento': 'background: #3498db; color: white;',
+    'Realizado': 'background: #27ae60; color: white;',
+    'Cancelado': 'background: #e74c3c; color: white;'
+  };
+  
+  return `
+    <tr>
+      <td>${result.cliente_nome}</td>
+      <td>${result.marca} ${result.modelo} (${result.placa || 'S/P'})</td>
+      <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${result.servico_realizado}">${result.servico_realizado}</td>
+      <td><span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; background: #6c757d; color: white;">${result.marca_servico}</span></td>
+      <td>${formatCurrency(result.valor)}</td>
+      <td>${formatDate(result.data_servico)}</td>
+      <td><span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; ${statusClass[result.status] || ''}">${result.status}</span></td>
+      <td>${result.funcionario}</td>
+    </tr>
+  `;
+}
+
+// Alternar visualização (cards/tabela)
+function toggleResultsView() {
+  const cardResults = document.getElementById('cardResults');
+  const tableResults = document.getElementById('tableResults');
+  const toggleIcon = document.getElementById('viewToggleIcon');
+  const toggleText = document.getElementById('viewToggleText');
+  
+  isTableView = !isTableView;
+  
+  if (isTableView) {
+    cardResults.style.display = 'none';
+    tableResults.style.display = 'block';
+    toggleIcon.className = 'fas fa-th-large';
+    toggleText.textContent = 'Visualização em Cards';
+  } else {
+    cardResults.style.display = 'block';
+    tableResults.style.display = 'none';
+    toggleIcon.className = 'fas fa-th-list';
+    toggleText.textContent = 'Visualização Detalhada';
+  }
+}
+
+// Atualizar contador de resultados
+function updateResultsCount(count) {
+  const totalResults = document.getElementById('totalResults');
+  if (totalResults) {
+    totalResults.textContent = `${count} resultado${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`;
+  }
+}
+
+// Atualizar estatísticas da pesquisa
+function updateSearchStats(results) {
+  const uniqueClients = new Set(results.map(r => r.cliente_id)).size;
+  const totalServices = results.length;
+  const totalValue = results.reduce((sum, r) => sum + parseFloat(r.valor), 0);
+  const completedServices = results.filter(r => r.status === 'Realizado').length;
+  
+  document.getElementById('statsClientes').textContent = uniqueClients;
+  document.getElementById('statsServicos').textContent = totalServices;
+  document.getElementById('statsValor').textContent = formatCurrency(totalValue);
+  document.getElementById('statsRealizados').textContent = completedServices;
+}
+
+// Limpar pesquisa
+function clearSearch() {
+  // Limpar todos os campos de entrada
+  document.querySelectorAll('.search-filters input, .search-filters select').forEach(input => {
+    if (input.type === 'select-one') {
+      input.selectedIndex = 0;
+    } else {
+      input.value = '';
+    }
+  });
+  
+  clearSearchResults();
+}
+
+// Limpar resultados
+function clearSearchResults() {
+  currentSearchResults = [];
+  
+  const cardResults = document.getElementById('cardResults');
+  cardResults.innerHTML = `
+    <div class="no-results">
+      <i class="fas fa-search"></i>
+      <h3>Nenhuma pesquisa realizada</h3>
+      <p>Use os filtros acima para encontrar clientes, serviços ou veículos</p>
+    </div>
+  `;
+  
+  const tableResults = document.getElementById('tableResults');
+  if (tableResults) {
+    tableResults.querySelector('tbody').innerHTML = '';
+  }
+  
+  document.getElementById('searchStats').style.display = 'none';
+  updateResultsCount(0);
+}
+
+// Exportar resultados
+function exportResults() {
+  if (currentSearchResults.length === 0) {
+    showMessage('Nenhum resultado para exportar', 'error');
+    return;
+  }
+  
+  try {
+    const data = {
+      timestamp: new Date().toISOString(),
+      total_results: currentSearchResults.length,
+      search_type: document.getElementById('searchType').value,
+      results: currentSearchResults
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `consulta-oficina-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showMessage(`${currentSearchResults.length} resultados exportados com sucesso!`);
+  } catch (error) {
+    console.error('Erro ao exportar resultados:', error);
+    showMessage('Erro ao exportar resultados', 'error');
   }
 }
 
