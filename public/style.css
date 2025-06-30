@@ -62,17 +62,24 @@ body {
   gap: 0.75rem;
   margin-bottom: 2rem;
   padding: 0 1.5rem;
+  text-decoration: none;
+  color: inherit;
 }
 
 .logo i {
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: var(--primary-color);
+  text-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
 }
 
 .logo h2 {
-  font-weight: 700;
-  font-size: 1.5rem;
+  font-weight: 800;
+  font-size: 1.75rem;
   color: var(--white);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.025em;
+  margin: 0;
+  line-height: 1;
 }
 
 .sidebar nav {
@@ -97,6 +104,7 @@ body {
 .sidebar nav a i {
   width: 20px;
   text-align: center;
+  font-size: 1.1rem;
 }
 
 .sidebar nav a.active,
@@ -439,6 +447,46 @@ tbody tr:hover {
   margin-top: 2rem;
 }
 
+.report-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.summary-item {
+  background: var(--gray-50);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+
+.summary-item h4 {
+  color: var(--gray-600);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.summary-item p {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+/* Status badges */
+.status-badge {
+  background: var(--success-color);
+  color: var(--white);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* Alertas */
 .alert {
   position: fixed;
@@ -490,6 +538,14 @@ tbody tr:hover {
   
   .logo {
     margin-bottom: 1rem;
+  }
+  
+  .logo h2 {
+    font-size: 1.5rem;
+  }
+  
+  .logo i {
+    font-size: 2rem;
   }
   
   .sidebar nav {
@@ -553,6 +609,14 @@ tbody tr:hover {
   form {
     padding: 1.5rem;
   }
+  
+  .logo h2 {
+    font-size: 1.25rem;
+  }
+  
+  .logo i {
+    font-size: 1.75rem;
+  }
 }
 
 /* Animações de entrada */
@@ -578,6 +642,7 @@ form,
 .loading {
   opacity: 0.6;
   pointer-events: none;
+  position: relative;
 }
 
 .loading::after {
